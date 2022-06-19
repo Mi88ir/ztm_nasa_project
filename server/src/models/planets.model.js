@@ -16,7 +16,7 @@ function loadPlanetsData() {
             .on("data", (data) => {
                 //We read the data here and store it in the results array
                 if (data.koi_disposition == 'CONFIRMED' && data.koi_insol > 0.36 && data.koi_insol < 1.11 && data.koi_prad < 1.6)
-                    results.push(data.kepler_name);
+                    results.push(data);
             })
             .on("error", (err) => {
                 //Error logging
