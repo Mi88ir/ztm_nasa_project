@@ -29,7 +29,19 @@ function addNewLaunches(req, res) {
   return res.status(201).json(launch);
 }
 
+function deleteLaunch(req, res) {
+  const launchId = +req.params.id;
+  if (!launchesModel.existsLaunchWithId(launchId)) {
+    return res.status(400).json({
+      error: "Data does not exist",
+    });
+  }
+  const aborted = launchesModel.abortLaunchById(launchId);
+  return res.status(200).json(aborted);
+}
+
 module.exports = {
   getAllLaunches,
   addNewLaunches,
+  deleteLaunch,
 };
