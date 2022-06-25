@@ -1,4 +1,6 @@
-const launches = new Map();
+const launchesDatabase = require("./launches.mongo");
+const planets = require("./planets.mongo");
+//const launches = new Map();
 
 let latestFlightNumber = 100;
 
@@ -13,7 +15,27 @@ const launch = {
   success: true,
 };
 
-launches.set(launch.flightNumber, launch);
+saveLaunch(launch);
+
+async function saveLaunch(launch) {
+  const planet = await planets.findOne({
+    keplerName: launch.target,
+  });
+  if (!planet) {
+    throw new Error("No matching planet found!");
+  }
+  await launchesDatabase.updateOne(
+    {
+      flightNumber: launch.flightNumber,
+    },
+    launch,
+    {
+      upsert: true,
+    }
+  );
+}
+
+//launches.set(launch.flightNumber, launch);
 
 //function for POST operation
 //Object.assign is used to assign value to a field in the map object
@@ -30,6 +52,16 @@ function addNewLaunch(launch) {
   );
 }
 
+async function getAllLaunches() {
+  return await launchesDatabase.find(
+    {},
+    {
+      _id: 0,
+      __v: 0,
+    }
+  );
+}
+
 function existsLaunchWithId(launchId) {
   return launches.has(launchId);
 }
@@ -42,7 +74,7 @@ function abortLaunchById(launchId) {
 }
 
 module.exports = {
-  launches,
+  getAllLaunches,
   addNewLaunch,
   existsLaunchWithId,
   abortLaunchById,
