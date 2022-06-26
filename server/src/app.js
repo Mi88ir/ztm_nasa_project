@@ -2,8 +2,10 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-const planetsRouter = require("./routes/planets.router");
-const launchesRouter = require("./routes/launches.router");
+
+//routers
+const api = require('./routes/api');
+
 const app = express();
 
 //Managing CORS
@@ -21,8 +23,8 @@ app.use(express.json());
 
 //Define path & router usage
 app.use(express.static(path.join(__dirname, "..", "public")));
-app.use(planetsRouter);
-app.use('/launches',launchesRouter);
+app.use('/v1',api); //support versions of the api
+
 
 //enabling the build to run on same port as server
 app.get("/*", (req, res) => {
