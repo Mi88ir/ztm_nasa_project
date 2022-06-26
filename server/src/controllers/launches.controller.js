@@ -7,7 +7,7 @@ async function getAllLaunches(req, res) {
   return res.status(200).json(await launchesModel.getAllLaunches());
 }
 
-function addNewLaunches(req, res) {
+async function addNewLaunches(req, res) {
   let launch = req.body;
   if (
     !launch.mission ||
@@ -25,19 +25,29 @@ function addNewLaunches(req, res) {
       error: "Invalid date value",
     });
   }
-  launchesModel.addNewLaunch(launch);
+  await launchesModel.scheduleNewLaunch(launch);
   return res.status(201).json(launch);
 }
 
-function deleteLaunch(req, res) {
+async function deleteLaunch(req, res) {
   const launchId = +req.params.id;
-  if (!launchesModel.existsLaunchWithId(launchId)) {
+  console.log(`Launch id is ${launchId}`);
+  const existsLaunch = await launchesModel.existsLaunchWithId(launchId);
+  if (!existsLaunch) {
     return res.status(400).json({
       error: "Data does not exist",
     });
   }
-  const aborted = launchesModel.abortLaunchById(launchId);
-  return res.status(200).json(aborted);
+  const aborted = await launchesModel.abortLaunchById(launchId);
+  console.log(`Aborted value is ${aborted}`);
+  if (!aborted) {
+    return res.status(400).json({
+      error: "Launch not aborted",
+    });
+  }
+  return res.status(200).json({
+    ok: true,
+  });
 }
 
 module.exports = {
